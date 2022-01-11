@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python
+    steps:
+      - checkout
+      - run:
+          name: Installing CMAKE
+          command: sudo apt install -y cmake libboost-python-dev libboost-numpy-dev libboost-all-dev
+      - run:
+          name: Create Virtual Environment
+          command: |
+            python3 -m venv venv
+            source venv/bin/activate
+      - run:
+          name: Creating Build Files
+          command: cmake -H. -Bbuild -DENABLE_TESTING=1 -DGENERATE_PYTHON_BINDINGS=1
+      - run:
+          name: Compiling
+          command: cmake --build build
+      - run:
+          name: Installing
+          command: sudo cmake --install build
+      - run:
+          name: PIP installing
+          command: pip install .
+      - run:
+          name: Testing
+          command: cd build && make test
